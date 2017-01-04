@@ -1,0 +1,59 @@
+sudo: required
+dist: trusty
+
+language: cpp
+
+compiler:
+  - gcc
+
+before_install:
+  # https://github.com/easylogging/easyloggingpp/blob/master/.travis.yml - as per..
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libgtest-dev
+  - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
+  
+install: 
+  # Always install valgrind
+  - sudo apt-get install valgrind
+
+  # Always install g++4.8.1
+  - sudo apt-get install -qq g++-4.8
+  - sudo apt-get install -qq g++-4.8-multilib
+  - if [ "$CXX" = "g++" ]; then export CMAKE_CXX_COMPILER="g++-4.8"; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
+
+  # Need to see if pkg-config is configured and what version
+  - sudo apt-get install libgtest-dev
+  - sudo apt-get install autoconf
+  # Not needed per se, but could be used to make a more minimal,readable xml
+  - sudo apt-get install xsltproc
+  # - sudo apt-get install castxml
+
+script:
+  # Creating build-enviroment
+  - export BD=$PWD/builddeps
+  - mkdir -p $BD
+  - export PATH=$BD/bin:$PATH
+  # Clone and build libev from fnchooft
+  - git clone git://github.com/fnchooft/libev 
+  - cd libev
+  - ./autogen.sh --prefi $BD
+  - make install DESTDIR=$BD
+    # Return to root-dir and build our package
+  - cd ..
+  # Clone and build hiredis from fnchooft
+  - git clone git://github.com/fnchooft/hiredis 
+  - cd hiredis
+  - ./autogen.sh --prefi $BD
+  - make install DESTDIR=$BD
+    # Return to root-dir and build our package
+  - cd ..
+
+  - ./autogen.sh --prefix $BD
+  - make
+  - make check
+  
+branches:
+  only:
+    - master
+    # - develop - might be a better choice for the future....
