@@ -4,7 +4,7 @@ AC_PREREQ([2.59])
 
 AM_INIT_AUTOMAKE([1.10 -Wall no-define foreign])
 
-PACKAGE_REQUIRES=`req.sh`
+PACKAGE_REQUIRES=`./req.sh`
 
 CXXFLAGS="$CFLAGS "
 LIBS="$LIBS "

@@ -39,7 +39,7 @@ script:
   - git clone git://github.com/fnchooft/libev 
   - cd libev
   - ./configure --prefix $BD
-  - make install DESTDIR=$BD
+  - make install
     # Return to root-dir and build our package
   - cd ..
   # Clone and build hiredis from fnchooft
@@ -48,7 +48,6 @@ script:
   - make install PREFIX=$BD
     # Return to root-dir and build our package
   - cd ..
-
   - ./autogen.sh --prefix $BD
   - make
   - make check
