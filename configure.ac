@@ -18,5 +18,4 @@ AC_PROG_CXX
 LT_INIT([static])
 
 AC_CONFIG_FILES([Makefile ${PACKAGE_NAME}-${PACKAGE_VERSION}.pc:pkg.pc.in])
-AC_CONFIG_FILES([src/Makefile])
 AC_OUTPUT
