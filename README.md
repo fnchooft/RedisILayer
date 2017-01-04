@@ -1,5 +1,7 @@
 ## Redis Intergration Layer
 
+[![Build Status](https://travis-ci.org/fnchooft/RedisILayer.svg?branch=master)](https://travis-ci.org/fnchooft/RedisILayer)
+
 This repository contains a Helper-class in C++ in order to integrate the Redis-datastore in C++ applications.
 
 The code depends on two third-party libraries:
