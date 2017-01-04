@@ -34,7 +34,8 @@ script:
   - export BD=$PWD/builddeps
   - mkdir -p $BD
   - export PATH=$BD/bin:$PATH
-  # Clone and build libev from fnchooft
+  - export PKG_CONFIG_PATH=$BD/share/pkgconfig
+    # Clone and build libev from fnchooft
   - git clone git://github.com/fnchooft/libev 
   - cd libev
   - ./autogen.sh --prefi $BD
