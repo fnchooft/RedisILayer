@@ -57,7 +57,7 @@ freeReplyObject(reply);
 }
 ```
 
-
+for more examples, take a look at the [tests](./src/RedisILayer_test.cpp).
 
 ### Register a Callback for a key-space notification
 ```c
@@ -95,19 +95,29 @@ After seeing some other client-[packages](https://redis.io/clients) such as [red
 This library is compiled by using autoconf and pkg-config.
 The library runs on:
  - Ubuntu (debian)
-   - 12.04 / 14.04 / 16.04
+   - 12.04 / 14.04 / (16.04 need to check)
 
 The basic compile steps are:
  - prep your environment
- - compile sub-package
-   - or install via ```sudo apt-get install libev hiredis-dev```
- - compile this-package
- - for more inspiration look at the [travis-configuration](.travis.yml)
+ - build/install sub-packages
+ - compile RedisILayer
 
+### Compile all local
 ```bash
-export BD=$BUILD_DIR_WHERE_EVER_YOU_WANT
-export PATH=$BD/bin:$PATH
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$BD/share/pkgconfig:$BD/lib/pkgconfig:
+# createbd.sh - Create Build-directory will:
+# 1. Creates a local builddeps-directory -- $BD
+# 2. Downloads and installs libev from source in 1.
+# 3. Downloads and installs hiredis from source in 1.
+. createbd.sh
+./autogen.sh --prefix $BD
+make
+make check
+make install
+```
+
+### Install ubuntu package compile RedisILayer-local
+```bash
+sudo apt-get install libev hiredis-dev
 ./autogen.sh --prefix $BD
 make
 make check
@@ -119,7 +129,7 @@ make check
 ```
 
 ## Examples
-See the [examples](examples)-directory for use cases.  
+See the [RedisILayer-tests](./src/RedisILayer_test.cpp)
 
 ## Contributors
  - [Fabian N.C. van 't Hooft](fnchooft@gmail.com)
