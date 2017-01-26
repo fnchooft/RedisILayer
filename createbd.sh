@@ -2,7 +2,7 @@
 export BD=$PWD/builddeps
 mkdir -p $BD
 export PATH=$BD/bin:$PATH
-export PKG_CONFIG_PATH=$BD/share/pkgconfig:$BD/lib/pkgconfig
+export PKG_CONFIG_PATH=$BD/share/pkgconfig:$BD/lib/pkgconfig:$PKG_CONFIG_PATH
 
 # Clone and build libev from fnchooft
 git clone git://github.com/fnchooft/libev 
