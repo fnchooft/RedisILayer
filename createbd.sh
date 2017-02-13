@@ -7,7 +7,7 @@ export PKG_CONFIG_PATH=$BD/share/pkgconfig:$BD/lib/pkgconfig:$PKG_CONFIG_PATH
 # Clone and build libev from fnchooft
 git clone git://github.com/fnchooft/libev 
 cd libev
-./configure --prefix $BD
+./autogen.sh --prefix $BD
 make install
 cd ..
 
