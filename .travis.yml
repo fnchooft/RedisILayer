@@ -41,7 +41,7 @@ script:
     # Clone and build libev from fnchooft
   - git clone git://github.com/fnchooft/libev 
   - cd libev
-  - ./configure --prefix $BD
+  - ./autogen.sh --prefix $BD
   - make install
     # Return to root-dir and build our package
   - cd ..
