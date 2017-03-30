@@ -1,4 +1,4 @@
-//!  Redis Intergration Class. 
+//!  Redis Integration Class.
 
 
 #ifndef __REDIS_ILAYER_HELPER_CLASS_H__
@@ -33,7 +33,7 @@ namespace Integration {
   Furthermore it provides a registration-mechanism for asynchronous calls based on libev.
   This allows for the registration of pub-sub or keyspace notifications.
   Every time the pattern matches the callback-function will be called.
-  
+
 */
 class RedisHelper {
   public:
@@ -54,7 +54,7 @@ class RedisHelper {
      * @param [out] OpticalLinkResult object that is filled on positive response
      */
     std::string getShaByScriptname(const std::string &scriptname);
-
+    std::map<std::string,std::string> getAllScripts(){ return mScripts; }
 
     std::string loadScript(const std::string &scriptblob);
 
@@ -65,7 +65,7 @@ class RedisHelper {
     // prefix matching criteria for which the script should be called.
     int registerCallback(const std::string &notification_type, int database, const std::string &prefix, redisCallbackFn *fn);
     /*
-    This function will never return... 
+    This function will never return...
     https://redis.io/topics/notifications#configuration
     You might have to create a thread for this...
     */
@@ -74,6 +74,8 @@ class RedisHelper {
     inline redisContext *getRedisContext(){ return mRedisContext; }
 
     std::string lastError();
+
+    void setPrivateDataPointer(void *priv_data){ mPrivateDataPtr = priv_data; }
 
   private:
     struct timeval mTimeout;
@@ -86,6 +88,8 @@ class RedisHelper {
     std::map<std::string,redisCallbackFn *> mNotificationPtrs;
 
     std::string mLastError;
+
+    void* mPrivateDataPtr; //! Pointer to some helper structure.
 }; // End of class RedisHelper
 
 } // End of namespace Integration

@@ -38,11 +38,12 @@ RedisHelper::RedisHelper(const std::string &hostname, uint16_t port, int timeout
 {
     mHostname     = hostname;
     mPort         = port;
- 
+
     mTimeout.tv_sec  = mTimeout_usec / 1000000 ;
     mTimeout.tv_usec = mTimeout_usec % 1000000 ;
- 
+
     mRedisContext    = NULL;
+    mPrivateDataPtr  = NULL; // Can set a void* to helper structure..
 } // RedisHelper::RedisHelper
 
 
@@ -55,13 +56,13 @@ RedisHelper::~RedisHelper()
 
 int RedisHelper::connect()
 {
-  // If there is trash here we know we tried to connect before...  
+  // If there is trash here we know we tried to connect before...
   if(mRedisContext != NULL)
   {
     mLastError = "Reconnection needed context not clean";
     return -3;
   }
-  
+
   mRedisContext = redisConnectWithTimeout(mHostname.c_str(), mPort, mTimeout);
 
   if(mRedisContext == NULL)
@@ -70,7 +71,7 @@ int RedisHelper::connect()
     return -2;
   }
 
-    
+
   if (mRedisContext->err)
   {
     std::ostringstream oss;
@@ -98,6 +99,7 @@ std::string RedisHelper::loadScript(const std::string &scriptblob)
   std::string script_sha;
   std::string script_data;
   script_data.append( scriptblob );
+  //std::cout << "SCRIPT_CONTENT:[\n" << script_data << "\n]" << std::endl;
 
   redisReply *reply = (redisReply*) redisCommand(mRedisContext, "SCRIPT LOAD %s",script_data.c_str());
   if (reply && reply->type == REDIS_REPLY_STRING)
@@ -122,7 +124,7 @@ int RedisHelper::loadScriptDir(const std::string &path, const std::string &patte
   for( std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++)
   {
     std::string sha = loadScript(readFileContent(*it));
-    std::cout << "\tSHA: [" << sha << "] script-name:[" << *it << "]" << std::endl;
+    //std::cout << "\tSHA: [" << sha << "] script-name:[" << *it << "]" << std::endl;
     if(sha.length() == 40)
     {
       mScripts[*it] = sha;
@@ -144,18 +146,20 @@ If you delete a key "mykey" two events are published:
 
 PUBLISH __keyspace@0__:mykey del
 PUBLISH __keyevent@0__:del mykey
- 
+
 Notification types (Key-space , Key-event)
  - Key-space notification
  - Key-event notification
 
-The first kind of event, with keyspace prefix in the channel is called a 
+The first kind of event, with keyspace prefix in the channel is called a
   Key-space notification
-, while the second, with the keyevent prefix, is called a 
+, while the second, with the keyevent prefix, is called a
 Key-event notification.
 
+Also note that matches on redis-key names will only work for keyspace notifications.
+See the documentation: https://redis.io/topics/notifications
 
-*/ 
+*/
 int RedisHelper::registerCallback(const std::string &notification_type, int database, const std::string &prefix, redisCallbackFn *fn)
 {
     std::ostringstream command;
@@ -177,14 +181,15 @@ int RedisHelper::runLoop(const std::string &notification_configuration)
   std::ostringstream config_cmd;
   config_cmd << "CONFIG SET notify-keyspace-events " << notification_configuration;
 
+  // The mPrivateDataPtr is passed to the callbacks as void* privdata.
   redisAsyncCommand(c, NULL, NULL, config_cmd.str().c_str());
   for(std::map<std::string, redisCallbackFn *>::iterator it = mNotificationPtrs.begin(); it != mNotificationPtrs.end(); it++)
   {
     std::cout << "Registering callback for: [" << it->first << "]" << std::endl;
-    redisAsyncCommand(c, it->second, NULL, it->first.c_str());
+    redisAsyncCommand(c, it->second, mPrivateDataPtr, it->first.c_str());
   }
   ev_loop(EV_DEFAULT_ 0);
-  return 0;  
+  return 0;
 } // RedisHelper::runLoop
 
 
